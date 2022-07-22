@@ -1,0 +1,41 @@
+const pokedex = document.getElementById('pokedex');
+let limit=5
+let offset=1
+
+function fetchPokemon (limit, offset) {
+    offset= Math.floor(Math.random()*150)
+    const promises = [];
+    
+    for (let i = offset; i <= offset+limit; i++) {
+        const url = `https://pokeapi.co/api/v2/pokemon/${i}`
+        promises.push(fetch(url).then((res) => res.json()))
+    }
+    Promise.all(promises).then((results) => {
+        const pokemon = results.map((result) => ({
+            name: result.name,
+            image: result.sprites['front_default'],
+            type: result.types.map((type) => type.type.name).join(', '),
+            id: result.id
+        }));
+        displayPokemon(pokemon);
+    });
+};
+
+const displayPokemon = (pokemon) => {
+    console.log(pokemon);
+    const pokemonHTMLString = pokemon
+        .map(
+            (pokeman) => `
+        <li class="card">
+            <img class="card-image" src="${pokeman.image}"/>
+            <h2 class="card-title">${pokeman.id}. ${pokeman.name}</h2>
+            <p class="card-subtitle">Type: ${pokeman.type}</p>
+        </li>
+    `
+        )
+        .join('');
+        if(pokedex)
+    pokedex.innerHTML = pokemonHTMLString;
+};
+
+fetchPokemon(limit, offset);
